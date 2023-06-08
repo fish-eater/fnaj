@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Add as Web app?</title>
+  <title>Add as web app!</title>
   <link rel="manifest" href="manifest.json">
   <script>
     // Fetch the title of the real.html page
@@ -10,13 +10,13 @@
       .then(html => {
         // Extract the title from the HTML content
         const titleMatch = html.match(/<title>(.*?)<\/title>/);
-        const pageTitle = titleMatch ? titleMatch[1] : 'Add as Web app?';
+        const pageTitle = titleMatch ? titleMatch[1] : 'Add as web app!';
 
         // Set the web app title dynamically
         document.title = pageTitle;
       })
       .catch(error => {
-        console.error('NO!!!! Failed to fetch real.html:', error);
+        console.error('NOO! Failed to fetch real.html:', error);
       });
   </script>
 </head>
@@ -29,11 +29,8 @@
     var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     var isAndroid = /Android/.test(navigator.userAgent);
 
-    // Redirect to real.html if not running in standalone mode or not on iOS or Android
-    if (!isStandalone || (!isIOS && !isAndroid)) {
-      window.location.href = '/real.html';
-    } else {
-      // Show "Add Web App" message with instructions and link to real.html
+    // Show the steps to add as a web app if on iOS or Android
+    if (isIOS || isAndroid) {
       document.body.innerHTML = `
         <h1>Add Web App</h1>
         <div>
@@ -45,6 +42,9 @@
           <p>If you prefer not to add it as a web app, you can <a href="/real.html">continue to the web app</a>.</p>
         </div>
       `;
+    } else if (!isStandalone) {
+      // Redirect to real.html if not running in standalone mode
+      window.location.href = '/real.html';
     }
   </script>
 </body>
