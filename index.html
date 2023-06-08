@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add as Web app?</title>
+  <link rel="manifest" href="manifest.json">
+  <script>
+    // Fetch the title of the real.html page
+    fetch('/real.html')
+      .then(response => response.text())
+      .then(html => {
+        // Extract the title from the HTML content
+        const titleMatch = html.match(/<title>(.*?)<\/title>/);
+        const pageTitle = titleMatch ? titleMatch[1] : 'Add as Web app?';
+
+        // Set the web app title dynamically
+        document.title = pageTitle;
+      })
+      .catch(error => {
+        console.error('NO!!!! Failed to fetch real.html:', error);
+      });
+  </script>
+</head>
+<body>
+  <script>
+    // Check if the web app is running in standalone mode (added to home screen)
+    var isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+    // Check if the user is on iOS or Android
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    var isAndroid = /Android/.test(navigator.userAgent);
+
+    // Redirect to real.html if not running in standalone mode or not on iOS or Android
+    if (!isStandalone || (!isIOS && !isAndroid)) {
+      window.location.href = '/real.html';
+    } else {
+      // Show "Add Web App" message with instructions and link to real.html
+      document.body.innerHTML = `
+        <h1>Add Web App</h1>
+        <div>
+          <p>To add this web app to your home screen:</p>
+          <ul>
+            <li>On iOS: Tap the Share icon and select "Add to Home Screen".</li>
+            <li>On Android: Tap the Menu icon and select "Add to Home screen".</li>
+          </ul>
+          <p>If you prefer not to add it as a web app, you can <a href="/real.html">continue to the web app</a>.</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
