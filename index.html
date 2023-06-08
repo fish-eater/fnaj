@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Add as web app!</title>
+  <title>Your Web App</title>
   <link rel="manifest" href="manifest.json">
   <script>
     // Fetch the title of the real.html page
@@ -10,42 +10,41 @@
       .then(html => {
         // Extract the title from the HTML content
         const titleMatch = html.match(/<title>(.*?)<\/title>/);
-        const pageTitle = titleMatch ? titleMatch[1] : 'Add as web app!';
+        const pageTitle = titleMatch ? titleMatch[1] : 'Your Web App';
 
         // Set the web app title dynamically
         document.title = pageTitle;
+
+        // Check if the web app is running in standalone mode (added to home screen)
+        var isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+        // Check if the user is on iOS or Android
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        var isAndroid = /Android/.test(navigator.userAgent);
+
+        // Show the steps to add as a web app if on iOS or Android
+        if ((isIOS || isAndroid) && !isStandalone) {
+          document.body.innerHTML = `
+            <h1>Add Web App</h1>
+            <div>
+              <p>To add this web app to your home screen:</p>
+              <ul>
+                <li>On iOS: Tap the Share icon and select "Add to Home Screen".</li>
+                <li>On Android: Tap the Menu icon and select "Add to Home screen".</li>
+              </ul>
+              <p>If you prefer not to add it as a web app, you can <a href="/real.html">continue to the web app</a>.</p>
+            </div>
+          `;
+        } else {
+          // Redirect to real.html if not on iOS or Android or if already running in standalone mode
+          window.location.href = '/real.html';
+        }
       })
       .catch(error => {
-        console.error('NOO! Failed to fetch real.html:', error);
+        console.error('Failed to fetch real.html:', error);
       });
   </script>
 </head>
 <body>
-  <script>
-    // Check if the web app is running in standalone mode (added to home screen)
-    var isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-
-    // Check if the user is on iOS or Android
-    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    var isAndroid = /Android/.test(navigator.userAgent);
-
-    // Show the steps to add as a web app if on iOS or Android
-    if (isIOS || isAndroid) {
-      document.body.innerHTML = `
-        <h1>Add Web App</h1>
-        <div>
-          <p>To add this web app to your home screen:</p>
-          <ul>
-            <li>On iOS: Tap the Share icon and select "Add to Home Screen".</li>
-            <li>On Android: Tap the Menu icon and select "Add to Home screen".</li>
-          </ul>
-          <p>If you prefer not to add it as a web app, you can <a href="/real.html">continue to the web app</a>.</p>
-        </div>
-      `;
-    } else if (!isStandalone) {
-      // Redirect to real.html if not running in standalone mode
-      window.location.href = '/real.html';
-    }
-  </script>
 </body>
 </html>
