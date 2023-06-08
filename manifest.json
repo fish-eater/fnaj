@@ -1,6 +1,4 @@
 {
-  "name": "The thing",
-  "short_name": "the thing",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#000000",
