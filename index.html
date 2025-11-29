@@ -1,78 +1,285 @@
+<!-- white apple web app! https://github.com/fish-eater/whiteapplewebapp -->
+<!-- made by fisheater -->
+
 <!DOCTYPE html>
-
-<!-- THIS IS A WHITE APPLE WEB APP! (https://github.com/fish-eater/whiteapplewebapp)  -->
-<!--            made by fisheater with love <3        -->
-
 <html>
 <head>
-  <title>White Apple 🍎💦</title>
+  <meta charset="UTF-8">
+  <title>white apple 🍎💦</title>
   <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
+    /* center container */
     body {
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #201c1c;
+      color: #fff;
       font-family: 'Open Sans', sans-serif;
-      background-color: #201c1c;
-      color: white;
       font-size: 20px;
+    }
+    .card {
+      background: #2a2323;
+      border-radius: 20px;
+      box-shadow: 0 6px 24px #000a;
+      padding: 2.5rem 2.2rem;
+      min-width: 330px;
+      max-width: 90vw;
+      text-align: center;
+    }
+    /* site header */
+    .site-header {
+      margin-bottom: 1.8rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #3a3333;
+    }
+    .site-header a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.3rem;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .site-header a:hover {
+      opacity: 0.7;
+    }
+    /* app header with icon and title */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #342d2d;
+      border-radius: 15px;
+    }
+    .app-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      box-shadow: 0 3px 10px #0006;
+      object-fit: cover;
+    }
+    .app-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    h1 { margin-top: 0; font-size: 2.1rem; }
+    h3 { margin-top: 0; }
+    .warning {
+      background: #4a3a2d;
+      border-left: 4px solid #ff9800;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      border-radius: 8px;
+      text-align: left;
+    }
+    ul {
+      text-align: left;
+      padding-left: 1.2rem;
+      margin: 1rem auto 1.5rem auto;
+      font-size: 1.08em;
+      list-style: none;
+    }
+    ul li {
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-step { 
+      font-size: 1.3em;
+      min-width: 1.3em;
+    }
+    .info {
+      margin-top: 1.5rem;
+      color: #b3afb8;
+      font-size: 1rem;
+    }
+    a { color: #ffddb1; text-decoration: underline; }
+    @media (max-width: 500px) {
+      .card { padding: 1.8rem 1.2rem; min-width: unset; }
+      body { font-size: 17px; }
+      .app-icon { width: 52px; height: 52px; }
+      .app-title { font-size: 1.2rem; }
     }
   </style>
   <script>
-    // Fetch the title of the real.html page
-    fetch('/real.html')
-      .then(response => response.text())
-      .then(html => {
-        // Extract the title from the HTML content
-        const titleMatch = html.match(/<title>(.*?)<\/title>/);
-        const pageTitle = titleMatch ? titleMatch[1] : 'White Apple 🍎💦';
+    // detect in-app browsers
+    function detectBrowser() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      
+      // in-app browser detection
+      const isFacebook = (ua.indexOf('FBAN') > -1) || (ua.indexOf('FBAV') > -1);
+      const isInstagram = ua.indexOf('Instagram') > -1;
+      const isSnapchat = ua.indexOf('Snapchat') > -1;
+      const isTwitter = ua.indexOf('Twitter') > -1;
+      const isTikTok = ua.indexOf('TikTok') > -1 || ua.indexOf('musical_ly') > -1;
+      const isLinkedIn = ua.indexOf('LinkedInApp') > -1;
+      const isMessenger = ua.indexOf('Messenger') > -1 || ua.indexOf('FBAN/MessengerForiOS') > -1;
+      const isDiscord = ua.indexOf('Discord') > -1;
+      
+      // real browser detection
+      const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+      const isAndroid = /Android/.test(ua);
+      const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+      const isChrome = /Chrome/.test(ua) && !/EdgiOS|OPiOS/.test(ua);
+      
+      return {
+        isInAppBrowser: isFacebook || isInstagram || isSnapchat || isTwitter || isTikTok || isLinkedIn || isMessenger || isDiscord,
+        inAppName: isFacebook ? 'Facebook' : isInstagram ? 'Instagram' : isSnapchat ? 'Snapchat' : 
+                   isTwitter ? 'Twitter' : isTikTok ? 'TikTok' : isLinkedIn ? 'LinkedIn' : 
+                   isMessenger ? 'Messenger' : isDiscord ? 'Discord' : 'in-app browser',
+        isIOS,
+        isAndroid,
+        canInstallPWA: (isIOS && isSafari) || (isAndroid && isChrome)
+      };
+    }
 
-        // Set the web app title dynamically
-        document.title = pageTitle;
+    // fallback for local testing without server
+    const isLocalFile = window.location.protocol === 'file:';
+    
+    // fetch title and icon from app/index.html
+    const fetchPage = isLocalFile 
+      ? Promise.resolve({ title: 'white apple 🍎💦', icon: '' }) 
+      : fetch('/app/index.html')
+          .then(r => r.text())
+          .then(html => {
+            const t = html.match(/<title>(.*?)<\/title>/i);
+            const iconMatch = html.match(/<link[^>]*rel=["'](?:icon|apple-touch-icon)["'][^>]*href=["']([^"']+)["']/i) ||
+                             html.match(/<link[^>]*href=["']([^"']+)["'][^>]*rel=["'](?:icon|apple-touch-icon)["']/i);
+            return {
+              title: t ? t[1] : 'white apple 🍎💦',
+              icon: iconMatch ? iconMatch[1] : '/favicon.ico'
+            };
+          })
+          .catch(() => ({ title: 'white apple 🍎💦', icon: '/favicon.ico' }));
 
-        // Check if the web app is running in standalone mode (added to home screen)
-        var isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    fetchPage.then(({ title, icon }) => {
+      document.title = title;
 
-        // Check if the user is on iOS or Android
-        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        var isAndroid = /Android/.test(navigator.userAgent);
+      const browser = detectBrowser();
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
-        // Show the steps to add as a web app if on iOS or Android
-        if ((isIOS || isAndroid) && !isStandalone) {
-          let instructions = '';
-
-          if (isIOS) {
-            instructions = `
-              <h3>TO DOWNLOAD APP (iOS)</h3>
-              <ul>
-                <li>1. Tap the Share icon.</li>
-                <li>2. Select "Add to Home Screen".</li>
-              </ul>
-            `;
-          } else if (isAndroid) {
-            instructions = `
-              <h3>TO DOWNLOAD APP (android)</h3>
-              <ul>
-                <li>1. Tap the menu icon</li>
-                <li>2. Select "Add to Home screen" OR "Install App".</li>
-              </ul>
-            `;
-          }
-
+      // if in-app browser, show instructions to open in real browser
+      if (browser.isInAppBrowser) {
+        let openInstructions = '';
+        if (browser.isIOS) {
+          openInstructions = `
+            <li><span class="icon-step">⋮</span><span>tap the <b>three dots</b> or <b>share</b> button</span></li>
+            <li><span class="icon-step">🌐</span><span>select <b>open in safari</b></span></li>
+          `;
+        } else if (browser.isAndroid) {
+          openInstructions = `
+            <li><span class="icon-step">⋮</span><span>tap the <b>three dots</b> menu</span></li>
+            <li><span class="icon-step">🌐</span><span>select <b>open in chrome</b> or <b>open in browser</b></span></li>
+          `;
+        }
+        
+        document.body.innerHTML = `
+          <div class="card">
+            <div class="site-header">
+              <a href="https://whiteapplecafe.ro">🍎 white apple cafe</a>
+            </div>
+            <div class="app-header">
+              ${icon ? `<img src="${icon}" alt="app icon" class="app-icon" onerror="this.style.display='none'">` : ''}
+              <h2 class="app-title">${title}</h2>
+            </div>
+            <div class="warning">
+              ⚠️ <strong>you're in ${browser.inAppName}</strong><br>
+              <small>to install this as an app, you need to open it in ${browser.isIOS ? 'Safari' : 'Chrome'}</small>
+            </div>
+            <h3>how to switch browsers</h3>
+            <ul>${openInstructions}</ul>
+            <div class="info">
+              or just <a href="/app/index.html">use the web version ↗️</a>
+            </div>
+          </div>
+        `;
+      }
+      // if real browser but not capable of PWA install
+      else if ((browser.isIOS || browser.isAndroid) && !browser.canInstallPWA && !isStandalone) {
+        document.body.innerHTML = `
+          <div class="card">
+            <div class="site-header">
+              <a href="https://whiteapplecafe.ro">🍎 white apple cafe</a>
+            </div>
+            <div class="app-header">
+              ${icon ? `<img src="${icon}" alt="app icon" class="app-icon" onerror="this.style.display='none'">` : ''}
+              <h2 class="app-title">${title}</h2>
+            </div>
+            <div class="warning">
+              ⚠️ <strong>can't install from this browser</strong><br>
+              <small>please open in ${browser.isIOS ? 'Safari' : 'Chrome'} to install as an app</small>
+            </div>
+            <div class="info">
+              or just <a href="/app/index.html">use the web version ↗️</a>
+            </div>
+          </div>
+        `;
+      }
+      // show install steps if capable browser and not installed
+      else if ((browser.isIOS || browser.isAndroid) && !isStandalone) {
+        let steps = '';
+        if (browser.isIOS) {
+          steps = `
+            <li><span class="icon-step">📤</span><span>tap <b>share</b> button</span></li>
+            <li><span class="icon-step">🏠</span><span>select <b>add to home screen</b></span></li>
+          `;
+        } else if (browser.isAndroid) {
+          steps = `
+            <li><span class="icon-step">⋮</span><span>tap <b>menu</b> (top right)</span></li>
+            <li><span class="icon-step">📥</span><span>choose <b>add to home screen</b> or <b>install app</b></span></li>
+          `;
+        }
+        document.body.innerHTML = `
+          <div class="card">
+            <div class="site-header">
+              <a href="https://whiteapplecafe.ro">🍎 white apple cafe</a>
+            </div>
+            <div class="app-header">
+              ${icon ? `<img src="${icon}" alt="app icon" class="app-icon" onerror="this.style.display='none'">` : ''}
+              <h2 class="app-title">${title}</h2>
+            </div>
+            <h3>quick install guide</h3>
+            <ul>${steps}</ul>
+            <div class="info">
+              just want the web version?<br>
+              <a href="/app/index.html">open here ↗️</a>
+            </div>
+          </div>
+        `;
+      } else {
+        // auto-forward to app/index.html for desktop or installed mode
+        if (!isLocalFile) {
+          window.location.href = '/app/index.html';
+        } else {
+          // show message for local testing
           document.body.innerHTML = `
-            <h1>WHITE APPLE 🍎💦 WEB APP!</h1>
-            <div>
-              ${instructions}
-              <p>Don't want to install? Web version --> <a href="/real.html">HERE!</a></p>
+            <div class="card">
+              <div class="site-header">
+                <a href="https://whiteapplecafe.ro">🍎 white apple cafe</a>
+              </div>
+              <div class="app-header">
+                ${icon ? `<img src="${icon}" alt="app icon" class="app-icon" onerror="this.style.display='none'">` : ''}
+                <h2 class="app-title">${title}</h2>
+              </div>
+              <p>⚠️ running locally - start a server to test properly</p>
+              <div class="info">see instructions in docs</div>
             </div>
           `;
-        } else {
-          // Redirect to real.html if not on iOS or Android or if already running in standalone mode
-          window.location.href = '/real.html';
         }
-      })
-      .catch(error => {
-        console.error('Failed to fetch real.html:', error);
-      });
+      }
+    });
+    // end script
   </script>
 </head>
 <body>
+<!-- content replaced by js -->
 </body>
 </html>
